@@ -2,3 +2,5 @@
 .vscode
 /vendor
 /storage
+
+/.phpunit.result.cache

@@ -1,11 +1,11 @@
 {
-  "name": "elad/flashy-json",
-  "description": "Flashy Company Home Mission",
+  "name": "gasner/json-repository",
+  "description": "A class that provides a simple interface for storing and retrieving data in a JSON file.",
   "type": "library",
   "license": "MIT",
   "autoload": {
     "psr-4": {
-      "Elad\\FlashyJson\\": "src/"
+      "Gasner\\JsonRepository\\": "src/"
     }
   },
   "authors": [
@@ -18,5 +18,8 @@
     "php": "^8.0",
     "ramsey/uuid": "^4.7",
     "halaxa/json-machine": "^1.1"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9"
   }
 }

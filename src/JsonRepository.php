@@ -1,7 +1,8 @@
 <?php
 
-namespace Elad\FlashyJson;
+namespace Gasner\JsonRepository;
 
+use Exception;
 use JsonMachine\Exception\InvalidArgumentException;
 use JsonMachine\Items;
 use JsonMachine\JsonDecoder\ExtJsonDecoder;
@@ -44,6 +45,29 @@ class JsonRepository
     }
 
     /**
+     * Retrieves selected columns from all records in the table.
+     *
+     * @param array $selectedColumns The names of the columns to include in the result.
+     * @return array An array of records, each containing only the selected columns.
+     */
+    public function fetch($selectedColumns): array
+    {
+        $records = [];
+        foreach ($this->rows as $uuid => $record) {
+            $cleanedRecord = [];
+            foreach ($selectedColumns as $column) {
+                if (isset($record[$column])) {
+                    $cleanedRecord[$column] = $record[$column];
+                }
+            }
+            $records[$uuid] = $cleanedRecord;
+        }
+
+        return $records;
+    }
+
+
+    /**
      * Adds a new record to the table.
      *
      * @param array $recordData The data to be added as a new record.
@@ -79,6 +103,9 @@ class JsonRepository
      */
     public function editRecord($uuid, $recordData): static
     {
+        if (!isset($this->rows[$uuid])) {
+            throw new Exception('record not found');
+        }
         $this->rows[$uuid] = $recordData;
         $this->saveData();
         return $this;
@@ -175,14 +202,15 @@ class JsonRepository
      * Creates a new table with the given name, if it doesn't already exist, and returns a repository instance for it.
      *
      * @param string $tableName The name of the table to create.
+     * @param boolean $destroyIfExist Whether to destroy the table if it already exists.
      *
      * @return JsonRepository A repository instance for the newly created table.
      * @throws InvalidArgumentException
      */
-    public static function create($tableName): JsonRepository
+    public static function create(string $tableName, bool $destroyIfExist = false): JsonRepository
     {
         $tablePath = self::getPath($tableName);
-        if (!file_exists($tablePath)) {
+        if (!file_exists($tablePath) || $destroyIfExist) {
             $jsonData = json_encode([]);
             file_put_contents($tablePath, $jsonData);
         }
