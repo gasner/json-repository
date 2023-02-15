@@ -1,18 +1,22 @@
 {
-    "name": "elad/flashy-json",
-    "description": "Flashy Company Home Mission",
-    "type": "library",
-    "license": "MIT",
-    "autoload": {
-        "psr-4": {
-            "Elad\\FlashyJson\\": "src/"
-        }
-    },
-    "authors": [
-        {
-            "name": "Elad",
-            "email": "eladgasner@gmail.com"
-        }
-    ],
-    "require": {}
+  "name": "elad/flashy-json",
+  "description": "Flashy Company Home Mission",
+  "type": "library",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Elad\\FlashyJson\\": "src/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Elad",
+      "email": "eladgasner@gmail.com"
+    }
+  ],
+  "require": {
+    "php": "^8.0",
+    "ramsey/uuid": "^4.7",
+    "halaxa/json-machine": "^1.1"
+  }
 }
