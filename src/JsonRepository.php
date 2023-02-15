@@ -7,40 +7,76 @@ use JsonMachine\Items;
 use JsonMachine\JsonDecoder\ExtJsonDecoder;
 use Ramsey\Uuid\Uuid;
 
+/**
+ * A class that provides a simple interface for storing and retrieving data in a JSON file.
+ */
 class JsonRepository
 {
 
+    /**
+     * The path where JSON files are stored.
+     * @var string
+     */
     private static string $dataPath = './storage/';
+
+    /**
+     * The name of the table in the database.
+     * @var string
+     */
     private string $tableName;
 
+    /**
+     * An array of rows in the table.
+     * @var array
+     */
     private array $rows = [];
 
+    /**
+     * Constructs a new instance of the JsonRepository class.
+     *
+     * @param string $tableName The name of the table.
+     * @throws InvalidArgumentException If the table name is not provided.
+     */
     public function __construct(string $tableName)
     {
         $this->tableName = $tableName;
         $this->loadData();
     }
 
-
     /**
-     * @throws InvalidArgumentException
+     * Adds a new record to the table.
+     *
+     * @param array $recordData The data to be added as a new record.
+     * @return static Returns the current instance of the JsonRepository class.
+     * @throws InvalidArgumentException If the record data is not provided.
      */
     public function addRecord(array $recordData): static
     {
-
         $t = Uuid::uuid7();
-
         $this->rows[$t->toString()] = $recordData;
         $this->saveData();
         return $this;
     }
 
-    public function getRecord($uuid):?array
+    /**
+     * Gets a record from the table based on its UUID.
+     *
+     * @param mixed $uuid The UUID of the record to retrieve.
+     * @return array|null Returns the data for the record, or null if it doesn't exist.
+     */
+    public function getRecord($uuid): ?array
     {
         $tableData = $this->loadData();
         return $tableData[$uuid] ??= null;
     }
 
+    /**
+     * Updates an existing record in the table.
+     *
+     * @param mixed $uuid The UUID of the record to update.
+     * @param array $recordData The new data for the record.
+     * @return static Returns the current instance of the JsonRepository class.
+     */
     public function editRecord($uuid, $recordData): static
     {
         $this->rows[$uuid] = $recordData;
@@ -48,23 +84,35 @@ class JsonRepository
         return $this;
     }
 
+    /**
+     * Deletes an existing record from the table.
+     *
+     * @param mixed $uuid The UUID of the record to delete.
+     * @return static Returns the current instance of the JsonRepository class.
+     */
     public function deleteRecord($uuid): static
     {
-
         unset($this->rows[$uuid]);
         $this->saveData();
         return $this;
     }
 
-
+    /**
+     * Gets the path to the table's JSON file.
+     *
+     * @return string Returns the path to the table's JSON file.
+     */
     private function getTablePath(): string
     {
         return self::$dataPath . '/' . $this->tableName . '.json';
     }
 
-
     /**
-     * @throws InvalidArgumentException
+     * Loads data from the table's JSON file.
+     *
+     * @param bool $refresh Whether to force a refresh of the data from the file.
+     * @return array Returns an array of the data in the table.
+     * @throws InvalidArgumentException If the table file cannot be read.
      */
     public function loadData(bool $refresh = false): array
     {
@@ -78,6 +126,11 @@ class JsonRepository
         return $this->rows;
     }
 
+    /**
+     * Saves the current data in the repository to the file system.
+     *
+     * @return static
+     */
     private function saveData(): static
     {
         $jsonData = json_encode($this->rows);
@@ -86,6 +139,8 @@ class JsonRepository
     }
 
     /**
+     * Gets the path to the data directory used by the repository.
+     *
      * @return string
      */
     public static function getDataPath(): string
@@ -94,27 +149,43 @@ class JsonRepository
     }
 
     /**
-     * @param string $dataPath
+     * Sets the path to the data directory used by the repository.
+     *
+     * @param string $dataPath The new path to the data directory.
      */
     public static function setDataPath(string $dataPath): void
     {
         self::$dataPath = $dataPath;
     }
 
+    /**
+     * Gets the path to a specific table's JSON file based on the table name.
+     *
+     * @param string $tableName The name of the table.
+     *
+     * @return string The path to the table's JSON file.
+     */
     private static function getPath($tableName): string
     {
         return self::$dataPath . '/' . $tableName . '.json';
     }
 
     /**
-     * @param $tableName
-     * @return JsonRepository
+     *
+     * Creates a new table with the given name, if it doesn't already exist, and returns a repository instance for it.
+     *
+     * @param string $tableName The name of the table to create.
+     *
+     * @return JsonRepository A repository instance for the newly created table.
+     * @throws InvalidArgumentException
      */
     public static function create($tableName): JsonRepository
     {
         $tablePath = self::getPath($tableName);
-        $jsonData = json_encode([]);
-        file_put_contents($tablePath, $jsonData);
+        if (!file_exists($tablePath)) {
+            $jsonData = json_encode([]);
+            file_put_contents($tablePath, $jsonData);
+        }
         return new self($tableName);
     }
 
