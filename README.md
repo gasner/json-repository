@@ -56,8 +56,7 @@ $records = $repository->fetch($selectedColumns);
 You can change the default data path by setting the JsonRepository::$dataPath property. By default, the data path is set to ./storage/.
 
 ```php
-
-JsonRepository::$dataPath = '/path/to/your/data/folder';
+JsonRepository::setDataPath('/path/to/your/data/folder');
 ```
 
 ## Static methods
@@ -68,9 +67,6 @@ JsonRepository also provides static methods for creating new tables and setting 
 
 // Create a new table named 'products'
 JsonRepository::create('products');
-
-// Set the data path to '/path/to/your/data/folder'
-JsonRepository::setDataPath('/path/to/your/data/folder');
 
 // Get the current data path
 $dataPath = JsonRepository::getDataPath();
